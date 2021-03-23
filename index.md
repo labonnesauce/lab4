@@ -15,7 +15,7 @@ Ce travail pratique vise les objectifs suivants :
 
 ## 2. Préparation et outils nécessaires (matériel)
 
-Ce laboratoire est quelque peu différent des précédents, puisque vous devrez utiliser du matériel supplémentaire, en l'occurrence le petit clavier externe à 16 touches que vous avez déjà utilisé dans le cours *Systèmes microprocesseur et interfaces*. Pour ceux n'ayant pas suivi le cours *Systèmes microprocesseur et interfaces*, vous pouvez vous procurer le claviers en ligne (par exemple [ici](https://www.amazon.ca/-/fr/Matrice-clavier-Arduino-Raspberry-adh%C3%A9sif/dp/B01N6X1C2I)). Pensez aussi à avoir le filage (ex. jumpers) pour faire la connexion aux RPi.
+Ce laboratoire est quelque peu différent des précédents, puisque vous devrez utiliser du matériel supplémentaire, en l'occurrence le petit clavier externe à 16 touches que vous avez déjà utilisé dans le cours *Systèmes microprocesseur et interfaces*. Pour ceux n'ayant pas suivi le cours *Systèmes microprocesseur et interfaces*, vous pouvez vous procurer le claviers au magasin de département de génie électrique et de génie informatique ou en ligne (par exemple [ici](https://www.amazon.ca/-/fr/Matrice-clavier-Arduino-Raspberry-adh%C3%A9sif/dp/B01N6X1C2I)). Pensez aussi à avoir le filage (ex. jumpers) pour faire la connexion aux RPi.
 
 Ce clavier est très rudimentaire et vous devrez concevoir la logique nécessaire à sa lecture. Il possède *huit* fils d'entrée/sortie : 4 connexions pour les lignes et 4 pour les colonnes. Ces sorties seront connectées aux *GPIO* (*General Purpose Input-Output*) de votre Raspberry Pi Zero. Ce dernier possède 40 points (pins) de connexion, agencés selon le schéma suivant (source : [element14](https://www.element14.com/community/docs/DOC-73950/l/raspberry-pi-3-model-b-gpio-40-pin-block-pinout)) :
 
@@ -132,7 +132,11 @@ Le laboratoire comporte deux livrables :
 1. Module du pilote effectuant une lecture du clavier par « pooling » (fichier *setr_driver_polling.c*);
 2. Module du pilote effectuant une lecture du clavier par interruption (fichier *setr_driver_irq.c*).
 
-Ce travail doit être réalisé **en équipe de deux**, la charge de travail étant à répartir équitablement entre les deux membres de l'équipe. Aucun rapport n'est à remettre, mais les deux équipiers doivent être en mesure d'expliquer leur approche et de démontrer le bon fonctionnement de votre pilote.  L'évaluation du laboratoire se fera par visioconférence. Vous devez céduler un rendez-vous avec l'équipe du cours pour une évaluation au plus tard durant la semaine du 20 avril 2020, ou plus tôt si vous êtes prêts. Nous vous conseillons d'utiliser un téléphone intelligent ou une tablette pour faire cette démonstration, où vous filmerez le fonctionnement de votre solution et répondrez aux questions, avec le clavier connecté sur le Raspberry Pi et l'affichage des résultats dans un terminal. Vous devrez également **déposer le code source et des binaires fonctionnels** de votre solution au laboratoire dans monPortail 24 heures avant l'évaluation de votre laboratoire.
+Ce travail doit être réalisé **en équipe de deux**, la charge de travail étant à répartir équitablement entre les deux membres de l'équipe. Aucun rapport n'est à remettre, mais vous devez soumettre votre code source et une vidéo de démonstration dans monPortail avant le **15 avril 2021, 9h30**. Ensuite, lors de la séance de laboratoire du **16 avril 2021**, les deux équipiers doivent être en mesure individuellement d'expliquer leur approche et de démontrer le bon fonctionnement de l'ensemble de la solution de l'équipe du laboratoire. Si vous ne pouvez pas vous y présenter, contactez l'équipe pédagogique du cours dans les plus brefs délais afin de convenir d'une date d'évaluation alternative. Ce travail compte pour **15%** de la note totale du cours. Comme pour les travaux précédents, votre code doit compiler **sans avertissements** de la part de GCC.
+
+La démonstration vidéo devra comprendre les éléments suivants:
+  1. TBD
+  2. TBD
 
 Ce travail compte pour **15%** de la note totale du cours.
 
