@@ -135,20 +135,23 @@ Le laboratoire comporte deux livrables :
 Ce travail doit être réalisé **en équipe de deux**, la charge de travail étant à répartir équitablement entre les deux membres de l'équipe. Aucun rapport n'est à remettre, mais vous devez soumettre votre code source et une vidéo de démonstration dans monPortail avant le **15 avril 2021, 9h30**. Ensuite, lors de la séance de laboratoire du **16 avril 2021**, les deux équipiers doivent être en mesure individuellement d'expliquer leur approche et de démontrer le bon fonctionnement de l'ensemble de la solution de l'équipe du laboratoire. Si vous ne pouvez pas vous y présenter, contactez l'équipe pédagogique du cours dans les plus brefs délais afin de convenir d'une date d'évaluation alternative. Ce travail compte pour **15%** de la note totale du cours. Comme pour les travaux précédents, votre code doit compiler **sans avertissements** de la part de GCC.
 
 La démonstration vidéo devra comprendre les éléments suivants:
-  1. TBD
-  2. TBD
+  1. L'exécution de la tâche de compilation avec sa sortie bien visible suivie de l'exécution de synchronisation;
+  2. Vous pourrez ensuite ouvrir deux terminaux côte à côte connectés en ssh à la Raspberry Pi, de la même façon que le labo 2:
+    - Dans le premier, lancez l'unique commande `watch -n 1 uptime` pour monitorer l'utilisation CPU au cours des différents tests ci-après;
+    - Dans le second, chargez le driver utilisant la méthode _polling_, puis lancez la commande `sudo tail -f /dev/claviersetr ---disable-inotify`. Vous pouvez ensuite appuyer sur toutes les touches une à une de gauche à droite et du haut vers le bas (_càd._ 1, 2, 3, A, ...). Vous devrez ensuite effectuer les combinaisons de touches 1A, 56, BC, 49, #D, 02, 123 et BCD suivies d'un appui de plusieurs secondes sur la touche *;
+    - Pour finir, toujours dans le même terminal, déchargez le driver précedent pour charger le driver reposant sur la méthode des interruptions et effectuer à nouveaux les appuis demandés ci-dessus.
 
 Ce travail compte pour **15%** de la note totale du cours.
 
 Le barême d'évaluation détaillé sera le suivant (laboratoire noté sur 20 points) :
 
 * (1 pts) Le module noyau se charge sans erreur et s'initialise correctement.
-* (5 pts) Pour le premier module, le clavier est lu par *polling* correctement (les valeurs retournées sont les bonnes, dans le bon ordre).
-* (5 pts) Pour le second module, les interruptions sont bien gérées et le clavier est lu sans nécessiter un *polling* continuel lorsqu'aucune touche n'est enfoncée.
+* (4 pts) Pour le premier module, le clavier est lu par *polling* correctement (les valeurs retournées sont les bonnes, dans le bon ordre).
+* (4 pts) Pour le second module, les interruptions sont bien gérées et le clavier est lu sans nécessiter un *polling* continuel lorsqu'aucune touche n'est enfoncée.
 * (2 pts) Le fichier /dev/claviersetr est bien créé et fonctionne comme demandé.
 * (2 pts) La synchronisation entre le thread d'écriture et la fonction de lecture est adéquate, de même que la gestion du tampon circulaire.
 * (1 pts) Le pilote gère la pression simultanée de plusieurs touches (au moins 2).
-* (2 pts) Les étudiants sont en mesure d'expliquer l'approche utilisée et de répondre aux questions concernant leur code.
+* (4 pts) Les étudiants sont en mesure d'expliquer l'approche utilisée et de répondre aux questions concernant leur code.
 * (2 pts) Les deux modules (*setr_driver_polling* et *setr_driver_irq*) compilent sans erreurs et sans avertissements
 
 
