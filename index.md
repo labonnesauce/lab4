@@ -137,9 +137,10 @@ Ce travail doit être réalisé **en équipe de deux**, la charge de travail ét
 La démonstration vidéo devra comprendre les éléments suivants:
   1. L'exécution de la tâche de compilation avec sa sortie bien visible suivie de l'exécution de synchronisation;
   2. Vous pourrez ensuite ouvrir deux terminaux côte à côte connectés en ssh à la Raspberry Pi, de la même façon que le laboratoire 2:
-    - Dans le premier, lancez l'unique commande `watch -n 1 uptime` pour monitorer l'utilisation CPU au cours des différents tests ci-après;
-    - Dans le second, chargez le driver utilisant la méthode _polling_, puis lancez la commande `sudo tail -f /dev/claviersetr ---disable-inotify`. Vous pouvez ensuite appuyer sur toutes les touches une à une de gauche à droite et du haut vers le bas (_càd._ 1, 2, 3, A, ...). Vous devrez ensuite effectuer les combinaisons de touches 1A, 56, BC, 49, #D et 02 suivies d'un appui de plusieurs secondes sur la touche *;
-    - Pour finir, toujours dans le même terminal, déchargez le driver précedent pour charger le driver reposant sur la méthode des interruptions et effectuer à nouveaux les appuis demandés ci-dessus.
+      - Dans le premier, lancez l'unique commande `watch -n 1 uptime` pour monitorer l'utilisation CPU au cours des différents tests ci-après;
+      - Dans le second, chargez le driver utilisant la méthode _polling_, puis lancez la commande `sudo tail -f /dev/claviersetr ---disable-inotify`. Vous pouvez ensuite appuyer sur toutes les touches une à une de gauche à droite et du haut vers le bas (_càd._ 1, 2, 3, A, ...). Vous devrez ensuite effectuer les combinaisons de touches 1A, 56, BC, 49, #D et 02 suivies d'un appui de plusieurs secondes sur la touche * ;
+      - Pour finir, toujours dans le même terminal, déchargez le driver précedent pour charger le driver reposant sur la méthode des interruptions et effectuer à nouveaux les appuis demandés ci-dessus.
+
 
 Comme pour le laboratoire 3, on va vous demander de filmer avec une caméra et non d'enregistrer l'écran pour vérifier les saisies au clavier, aussi vous devrez cadrer en même temps l'écran et le clavier (les sorties des terminaux étant courtes vous pouvez réduire leur taille et placer le clavier devant l'écran en vous assurant que le tout soit correctment lisible).
 
