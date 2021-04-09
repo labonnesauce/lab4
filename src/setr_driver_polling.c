@@ -69,7 +69,7 @@ static struct task_struct *task;            // Réfère au thread noyau
 // 4 GPIO doivent être assignés pour l'écriture, et 4 en lecture (voir énoncé)
 // Nous vous proposons les choix suivants, mais ce n'est pas obligatoire
 static int  gpiosEcrire[] = {5, 6, 13, 19};             // Correspond aux pins 29, 31, 33 et 35
-static int  gpiosLire[] = {12, 16, 20, 21};             // Correspond aux pins 32, 36, 38, et 40
+static int  gpiosLire[] = {12, 16, 20};             // Correspond aux pins 32, 36, 38, et 40
 // Les noms des différents GPIO
 static char* gpiosEcrireNoms[] = {"OUT1", "OUT2", "OUT3", "OUT4"};
 static char* gpiosLireNoms[] = {"IN1", "IN2", "IN3", "IN4"};
@@ -83,16 +83,16 @@ static int   patterns[4][4] = {
 };
 
 // Les valeurs du clavier, selon la ligne et la colonne actives
-static char valeursClavier[4][4] = {
-    {'1', '2', '3', 'A'},
-    {'4', '5', '6', 'B'},
-    {'7', '8', '9', 'C'},
-    {'*', '0', '#', 'D'}
+static char valeursClavier[3][4] = {
+    {'1', '2', '3'},
+    {'4', '5', '6'},
+    {'7', '8', '9'},
+    {'*', '0', '#'}
 };
 
 // Permet de se souvenir du dernier état du clavier,
 // pour ne pas répéter une touche qui était déjà enfoncée.
-static int dernierEtat[4][4] = {0};
+static int dernierEtat[3][4] = {0};
 
 
 
@@ -119,6 +119,32 @@ static int pollClavier(void *arg){
       // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
       // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
       // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
+      char valeurLues[12] = {0};
+      int nombre = 0;
+      for(ligne = 0; ligne < 4; ligne++){
+          gpio_set_value(gpiosEcrire[ligne], 1);
+          for (collone = 0; collone < 3; collone++) {
+              val = gpio_get_value(gpiosLire[collone]);
+              if(val & dernierEtat[ligne][colonne] == 0){
+                  valeursLues[nombre] = valeursClavier[ligne][colonne];
+                  nombre++;
+              }
+              if(val != dernierEtat[ligne][colonne]){
+                  dernierEtat[ligne][colonne]  = val;
+              }
+        }
+        gpio_set_value(gpiosEcrire[ligne][colonne], 0);
+      }
+
+      if(nombre <= 2){
+          mutex_lock(&sync);
+
+          for(int i = 0; i < nombre; i++){
+              date[posCouranteEcriture] = valeurLues[i];
+              posCouranteEcriture = (posCouranteEcriture + 1) & TAILLE_BUFFER;
+          }
+          mutex_unlock(&sync);
+      }
 
 
       set_current_state(TASK_INTERRUPTIBLE); // On indique qu'on peut ere interrompu
