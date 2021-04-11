@@ -69,21 +69,14 @@ static struct task_struct *task;            // Réfère au thread noyau
 // 4 GPIO doivent être assignés pour l'écriture, et 4 en lecture (voir énoncé)
 // Nous vous proposons les choix suivants, mais ce n'est pas obligatoire
 static int  gpiosEcrire[] = {5, 6, 13, 19};             // Correspond aux pins 29, 31, 33 et 35
-static int  gpiosLire[] = {12, 16, 20};             // Correspond aux pins 32, 36, 38, et 40
+static int  gpiosLire[] = {12, 16, 20};             // Correspond aux pins 32, 36, 38
 // Les noms des différents GPIO
 static char* gpiosEcrireNoms[] = {"OUT1", "OUT2", "OUT3", "OUT4"};
 static char* gpiosLireNoms[] = {"IN1", "IN2", "IN3", "IN4"};
 
-// Les patrons de balayage (une seule ligne doit être active à la fois)
-static int   patterns[4][4] = {
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}
-};
 
 // Les valeurs du clavier, selon la ligne et la colonne actives
-static char valeursClavier[3][4] = {
+static char valeursClavier[4][3] = {
     {'1', '2', '3'},
     {'4', '5', '6'},
     {'7', '8', '9'},
@@ -92,7 +85,7 @@ static char valeursClavier[3][4] = {
 
 // Permet de se souvenir du dernier état du clavier,
 // pour ne pas répéter une touche qui était déjà enfoncée.
-static int dernierEtat[3][4] = {0};
+static int dernierEtat[4][3] = {0};
 
 
 
@@ -108,10 +101,8 @@ static int dureeDebounce = 50;
 
 static int pollClavier(void *arg){
     // Cette fonction contient la boucle principale du thread détectant une pression sur une touche
-    int patternIdx, ligneIdx, colIdx, val;
     printk(KERN_INFO "SETR_CLAVIER : Poll clavier declenche! \n");
     while(!kthread_should_stop()){           // Permet de s'arrêter en douceur lorsque kthread_stop() sera appelé
-      set_current_state(TASK_RUNNING);      // On indique qu'on est en train de faire quelque chose
 
       // TODO
       // Écrivez le code permettant
@@ -119,34 +110,41 @@ static int pollClavier(void *arg){
       // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
       // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
       // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
-      char valeurLues[12] = {0};
+      char valeursLues[12];
       int nombre = 0;
+      int ligne;
+      int colonne;
+      int val;
+      set_current_state(TASK_RUNNING);      // On indique qu'on est en train de faire quelque chose
+
+      
+      mutex_lock(&sync);
       for(ligne = 0; ligne < 4; ligne++){
           gpio_set_value(gpiosEcrire[ligne], 1);
-          for (collone = 0; collone < 3; collone++) {
-              val = gpio_get_value(gpiosLire[collone]);
-              if(val & dernierEtat[ligne][colonne] == 0){
+          for (colonne = 0; colonne < 3; colonne++) {
+              val = gpio_get_value(gpiosLire[colonne]);
+              if(val == 1 && dernierEtat[ligne][colonne] == 0){
                   valeursLues[nombre] = valeursClavier[ligne][colonne];
                   nombre++;
               }
               if(val != dernierEtat[ligne][colonne]){
-                  dernierEtat[ligne][colonne]  = val;
+                  dernierEtat[ligne][colonne] = val;
               }
-        }
-        gpio_set_value(gpiosEcrire[ligne][colonne], 0);
+          }
+          gpio_set_value(gpiosEcrire[ligne], 0);
       }
 
       if(nombre <= 2){
-          mutex_lock(&sync);
-
-          for(int i = 0; i < nombre; i++){
-              date[posCouranteEcriture] = valeurLues[i];
-              posCouranteEcriture = (posCouranteEcriture + 1) & TAILLE_BUFFER;
+          int i;
+          for(i = 0; i < nombre; i++){
+              data[posCouranteEcriture] = valeursLues[i];
+              posCouranteEcriture++;
+              if(posCouranteEcriture >= TAILLE_BUFFER)
+                posCouranteEcriture = 0;
           }
-          mutex_unlock(&sync);
       }
 
-
+      mutex_unlock(&sync);
       set_current_state(TASK_INTERRUPTIBLE); // On indique qu'on peut ere interrompu
       msleep(pausePollingMs);                // On se met en pause un certain temps
     }
@@ -156,7 +154,8 @@ static int pollClavier(void *arg){
 
 
 static int __init setrclavier_init(void){
-    int i, ok;
+    int ligne;
+    int colonne;
     printk(KERN_INFO "SETR_CLAVIER : Initialisation du driver commencee\n");
 
     // On enregistre notre pilote
@@ -192,6 +191,15 @@ static int __init setrclavier_init(void){
     //
     // Vous devez également initialiser le mutex de synchronisation.
 
+    for(ligne=0;ligne<4;ligne++){
+        gpio_request_one(gpiosEcrire[ligne], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[ligne]);
+    }
+    for(colonne=0;colonne<3;colonne++){
+        gpio_request_one(gpiosLire[colonne], GPIOF_IN, gpiosLireNoms[colonne]);
+        gpio_set_debounce(gpiosLire[colonne], dureeDebounce);
+    }
+
+    mutex_init(&sync);
 
 
     // Le mutex devrait avoir été initialisé avant d'appeler la ligne suivante!
@@ -204,7 +212,8 @@ static int __init setrclavier_init(void){
 
 
 static void __exit setrclavier_exit(void){
-    int i;
+    int ligne;
+    int colonne;
 
     // On arrête le thread de lecture
     kthread_stop(task);
@@ -212,6 +221,13 @@ static void __exit setrclavier_exit(void){
     // TODO
     // Écrivez le code permettant de relâcher (libérer) les GPIO
     // Vous aurez pour cela besoin de la fonction gpio_free
+    
+    for(ligne=0;ligne<4;ligne++){
+        gpio_free(gpiosEcrire[ligne]);
+    }
+    for(colonne=0;colonne<3;colonne++){
+        gpio_free(gpiosLire[colonne]);
+    }
 
     // On retire correctement les différentes composantes du pilote
     device_destroy(setrClasse, MKDEV(majorNumber, 0));
@@ -249,6 +265,32 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     // revienne alors à 0. Il est donc tout à fait possible que posCouranteEcriture soit INFÉRIEUR à
     // posCouranteLecture, et vous devez gérer ce cas sans perdre de caractères et en respectant les
     // autres conditions (par exemple, ne jamais copier plus que len caractères).
+    
+    
+    int NoctetsDisponible = (posCouranteEcriture - posCouranteLecture) % TAILLE_BUFFER;
+    int N = min(len, NoctetsDisponible);
+
+    char buffFrom[N];
+    int i;
+    unsigned long Notcopied;
+
+    mutex_lock(&sync);
+
+    for (i = 0; i < N; i++) {
+        buffFrom[i] = data[posCouranteLecture];
+        posCouranteLecture++;
+        if(posCouranteLecture>=TAILLE_BUFFER)
+            posCouranteLecture = 0;
+    }
+    
+    Notcopied = copy_to_user(buffer, buffFrom, N);
+    if(Notcopied != 0) {
+        printk(KERN_INFO "Erreur copy_to_user \n");
+    }
+
+    mutex_unlock(&sync);
+    return N;
+
 
 }
 
@@ -258,6 +300,6 @@ module_exit(setrclavier_exit);
 
 // Description du module
 MODULE_LICENSE("GPL");            // Licence : laissez "GPL"
-MODULE_AUTHOR("Vous!");           // Vos noms
+MODULE_AUTHOR("Christophe et Olivier!");           // Vos noms
 MODULE_DESCRIPTION("Lecteur de clavier externe");  // Description du module
 MODULE_VERSION("0.2");            // Numéri de version

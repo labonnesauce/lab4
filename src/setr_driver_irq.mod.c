@@ -28,14 +28,32 @@ __attribute__((section("__versions"))) = {
 	{ 0xcb0a126b, "module_layout" },
 	{ 0x750f20c1, "class_unregister" },
 	{ 0x9a1ce951, "device_destroy" },
+	{ 0xc1514a3b, "free_irq" },
+	{ 0xfe990052, "gpio_free" },
+	{ 0xda053c82, "__mutex_do_init" },
+	{ 0x41bf7845, "__rt_mutex_init" },
 	{ 0xd6b8e852, "request_threaded_irq" },
+	{ 0x54c3ab6, "gpiod_to_irq" },
+	{ 0x9647310, "gpiod_set_debounce" },
 	{ 0xe83bf01d, "class_destroy" },
+	{ 0x403f9529, "gpio_request_one" },
 	{ 0x652b0cd9, "device_create" },
 	{ 0x6bc3fbc0, "__unregister_chrdev" },
 	{ 0xea6dd11b, "__class_create" },
 	{ 0x90ecee87, "__register_chrdev" },
+	{ 0xfaef0ed, "__tasklet_schedule" },
+	{ 0xf4fa543b, "arm_copy_to_user" },
 	{ 0x7c32d0f0, "printk" },
 	{ 0x2e5810c6, "__aeabi_unwind_cpp_pr1" },
+	{ 0x8f678b07, "__stack_chk_guard" },
+	{ 0xdb7305a1, "__stack_chk_fail" },
+	{ 0xfcec0987, "enable_irq" },
+	{ 0x140a52b, "_mutex_unlock" },
+	{ 0x573a7d4f, "gpiod_get_raw_value" },
+	{ 0x112a1d12, "_mutex_lock" },
+	{ 0x22d04384, "gpiod_set_raw_value" },
+	{ 0x16ee9571, "gpio_to_desc" },
+	{ 0x27bbf221, "disable_irq_nosync" },
 	{ 0xb1ad28e0, "__gnu_mcount_nc" },
 };
 
@@ -45,4 +63,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "60F8F85AE97C0322A234888");
+MODULE_INFO(srcversion, "6A9813642BC99798036885C");

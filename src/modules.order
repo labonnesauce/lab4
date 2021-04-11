@@ -1,2 +1,2 @@
-kernel//home/setr/projects/labo4/lab4/src/setr_driver_polling.ko
-kernel//home/setr/projects/labo4/lab4/src/setr_driver_irq.ko
+kernel//home/setr/projets/lab4/src/setr_driver_polling.ko
+kernel//home/setr/projets/lab4/src/setr_driver_irq.ko
