@@ -47,10 +47,10 @@ __attribute__((section("__versions"))) = {
 	{ 0x2e5810c6, "__aeabi_unwind_cpp_pr1" },
 	{ 0x8f678b07, "__stack_chk_guard" },
 	{ 0xdb7305a1, "__stack_chk_fail" },
-	{ 0xfcec0987, "enable_irq" },
 	{ 0x140a52b, "_mutex_unlock" },
-	{ 0x573a7d4f, "gpiod_get_raw_value" },
 	{ 0x112a1d12, "_mutex_lock" },
+	{ 0xfcec0987, "enable_irq" },
+	{ 0x573a7d4f, "gpiod_get_raw_value" },
 	{ 0x22d04384, "gpiod_set_raw_value" },
 	{ 0x16ee9571, "gpio_to_desc" },
 	{ 0x27bbf221, "disable_irq_nosync" },
@@ -63,4 +63,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "6A9813642BC99798036885C");
+MODULE_INFO(srcversion, "3F059D5F91C690E5C7A799D");

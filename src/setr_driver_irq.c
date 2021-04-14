@@ -75,7 +75,7 @@ static int  gpiosLire[] = {12, 16, 20};             // Correspond aux pins 32, 3
 static char* gpiosEcrireNoms[] = {"OUT1", "OUT2", "OUT3", "OUT4"};
 static char* gpiosLireNoms[] = {"IN1", "IN2", "IN3", "IN4"};
 
-static unsigned int irqId[3];               // Contient les numéros d'interruption pour chaque broche de lecture
+static unsigned int irqId[4];               // Contient les numéros d'interruption pour chaque broche de lecture
 
 
 // Les valeurs du clavier, selon la ligne et la colonne actives
@@ -118,26 +118,31 @@ void func_tasklet_polling(unsigned long param){
     // 5) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
     // 6) Remettre toutes les lignes à 1 (pour réarmer l'interruption)
     // 7) Réactiver le traitement des interruptions
-      char valeursLues[12];
+    
+      char valeursLues[12] = {0};
       int nombre = 0;
       int ligne;
       int colonne;
       int val;
+      int i;
 
-      for(colonne=0;colonne<3;colonne++)
-        disable_irq_nosync(irqId[colonne]);
+
+      for(colonne=0;colonne<4;colonne++){
+            disable_irq_nosync(irqId[colonne]);
+      }
 
       for(ligne=0;ligne<4;ligne++){
           gpio_set_value(gpiosEcrire[ligne], 0);
       }
+      
 
       
-      mutex_lock(&sync);
+      
       for(ligne = 0; ligne < 4; ligne++){
           gpio_set_value(gpiosEcrire[ligne], 1);
           for (colonne = 0; colonne < 3; colonne++) {
               val = gpio_get_value(gpiosLire[colonne]);
-              if(val == 1 && dernierEtat[ligne][colonne] == 0){
+              if(val==1 && dernierEtat[ligne][colonne] == 0){
                   valeursLues[nombre] = valeursClavier[ligne][colonne];
                   nombre++;
               }
@@ -148,26 +153,24 @@ void func_tasklet_polling(unsigned long param){
           gpio_set_value(gpiosEcrire[ligne], 0);
       }
 
-      if(nombre <= 2){
-          int i;
-          for(i = 0; i < nombre; i++){
-              data[posCouranteEcriture] = valeursLues[i];
-              posCouranteEcriture++;
-              if(posCouranteEcriture >= TAILLE_BUFFER)
-                posCouranteEcriture = 0;
-          }
-      }
+    if(nombre < 3){
+    mutex_lock(&sync);
+        for(i = 0; i < nombre; i++){
+            data[posCouranteEcriture] = valeursLues[i];
+            posCouranteEcriture++;
+            if(posCouranteEcriture >= TAILLE_BUFFER)
+            posCouranteEcriture = 0;
+        }
+    mutex_unlock(&sync);
+    }
 
-      mutex_unlock(&sync);
-
-      for(ligne=0;ligne<4;ligne++){
-          gpio_set_value(gpiosEcrire[ligne], 1);
-      }
-
-      atomic_set(&irqActif, 1);
-      for(colonne=0;colonne<3;colonne++)
-        enable_irq(irqId[colonne]);
-
+    for (i = 0; i < 4; i++) {
+        gpio_set_value(gpiosEcrire[i], 1);
+    }
+    for (i = 0; i < 3; i++) {
+        enable_irq(irqId[i]);
+    }
+    atomic_set(&irqActif, 1);
 }
 
 // On déclare le tasklet avec la macro DECLARE_TASKLET
